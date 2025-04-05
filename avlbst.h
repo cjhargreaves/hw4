@@ -368,77 +368,67 @@ void AVLTree<Key, Value>::insertFix(AVLNode<Key, Value>* node, int8_t diff)
 template<class Key, class Value>
 void AVLTree<Key, Value>::remove(const Key& key)
 {
-    AVLNode<Key, Value>* curr = static_cast<AVLNode<Key, Value>*>(this->internalFind(key));
-  if ( curr == nullptr ) { return; }
-
-  // two children, swap with predecessor
-  //
-  if (curr->getLeft() != nullptr && curr->getRight() != nullptr) {
-    AVLNode<Key, Value>* predecessor = static_cast<AVLNode<Key, Value>*>(this->predecessor(curr));
-    nodeSwap(curr, predecessor);
-  }
-
-  // curr has at most one child now
-  //
-  AVLNode<Key, Value>* parent = curr->getParent();
-
-  bool isLeft = (parent != nullptr && parent->getLeft() == curr);
-
-  // get child to replace current if exist
-  //
-  AVLNode<Key, Value>* child = curr->getLeft();
-  if (child == nullptr) {
-    child = curr->getRight();
-  }
-
-  if (parent == nullptr) {
-    this->root_ = child;
-  }
-
-  else if (isLeft) {
-    parent->setLeft(child);
-  }
-
-  else {
-    parent->setRight(child);
-  }
-
-  if (child != nullptr) {
-    child->setParent(parent);
-  }
-
-  if (parent != nullptr) {
-    int8_t diff;
-
-    if (isLeft) {
-      diff = 1;
-    } else {
-      diff = -1;
+    AVLNode<Key, Value>* node = static_cast<AVLNode<Key, Value>*>(this->internalFind(key));
+    if (node == nullptr) {
+        return;
     }
 
-    removeFix(parent, diff);
-  }
+    // If node has two children, swap with predecessor
+    if (node->getLeft() != nullptr && node->getRight() != nullptr) {
+        AVLNode<Key, Value>* pred = static_cast<AVLNode<Key, Value>*>(this->predecessor(node));
+        nodeSwap(node, pred);
+    }
 
+    // Now node has at most one child
+    AVLNode<Key, Value>* parent = node->getParent();
+    AVLNode<Key, Value>* child = (node->getLeft() != nullptr) ? node->getLeft() : node->getRight();
+    int8_t diff = 0;
 
-  delete curr;
+    // Calculate balance factor change for parent
+    if (parent != nullptr) {
+        if (parent->getLeft() == node) {
+            diff = -1; // Removing from left child, will decrease balance
+        } else {
+            diff = 1; // Removing from right child, will increase balance
+        }
+    }
+
+    if (child != nullptr) {
+        child->setParent(parent);
+    }
+
+    if (parent == nullptr) {
+        this->root_ = child;
+    } else if (parent->getLeft() == node) {
+        parent->setLeft(child);
+    } else {
+        parent->setRight(child);
+    }
+
+    delete node;
+
+    if (parent != nullptr) {
+        removeFix(parent, diff);
+    }
 }
 
 template<class Key, class Value>
-void AVLTree<Key, Value>::removeFix(AVLNode<Key, Value>* node, int8_t diff) {
-    // Base case: if node is null, return
-    if (node == nullptr) { return; }
+void AVLTree<Key, Value>::removeFix(AVLNode<Key, Value>* node, int8_t diff)
+{
+    if (node == nullptr) return;
 
-    // Calculate next recursive call parameters
+    // Calculate next node and diff for potential upward propagation
     AVLNode<Key, Value>* parent = node->getParent();
-
-    int8_t ndiff = 0;
+    int8_t nextDiff = 0;
+    
     if (parent != nullptr) {
         if (parent->getLeft() == node) {
-            ndiff = -1;
+            nextDiff = -1;
         } else {
-            ndiff = 1;
+            nextDiff = 1;
         }
     }
+
     // Apply the balancing change
     node->updateBalance(diff);
     
@@ -461,7 +451,7 @@ void AVLTree<Key, Value>::removeFix(AVLNode<Key, Value>* node, int8_t diff) {
                 node->setBalance(0);
                 leftChild->setBalance(0);
                 // Continue propagation
-                if (parent) removeFix(parent, ndiff);
+                if (parent) removeFix(parent, nextDiff);
             }
         } else {
             // Left-right case
@@ -483,7 +473,7 @@ void AVLTree<Key, Value>::removeFix(AVLNode<Key, Value>* node, int8_t diff) {
             rightGrandchild->setBalance(0);
             
             // Continue propagation
-            if (parent) removeFix(parent, ndiff);
+            if (parent) removeFix(parent, nextDiff);
         }
     } else if (node->getBalance() == -2) {
         // Right heavy
@@ -503,7 +493,7 @@ void AVLTree<Key, Value>::removeFix(AVLNode<Key, Value>* node, int8_t diff) {
                 node->setBalance(0);
                 rightChild->setBalance(0);
                 // Continue propagation
-                if (parent) removeFix(parent, ndiff);
+                if (parent) removeFix(parent, nextDiff);
             }
         } else {
             // Right-left case
@@ -525,7 +515,7 @@ void AVLTree<Key, Value>::removeFix(AVLNode<Key, Value>* node, int8_t diff) {
             leftGrandchild->setBalance(0);
             
             // Continue propagation
-            if (parent) removeFix(parent, ndiff);
+            if (parent) removeFix(parent, nextDiff);
         }
     } else if (node->getBalance() == 1 || node->getBalance() == -1) {
         // Node is balanced but not perfectly - no propagation needed
@@ -533,11 +523,10 @@ void AVLTree<Key, Value>::removeFix(AVLNode<Key, Value>* node, int8_t diff) {
     } else {
         // Node is perfectly balanced (0), continue propagation
         if (parent && diff != 0) {
-            removeFix(parent, ndiff);
+            removeFix(parent, nextDiff);
         }
     }
 }
-
 
 template<class Key, class Value>
 void AVLTree<Key, Value>::nodeSwap( AVLNode<Key,Value>* n1, AVLNode<Key,Value>* n2)
