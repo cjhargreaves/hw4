@@ -212,7 +212,6 @@ void AVLTree<Key, Value>::rotateLeft(AVLNode<Key, Value>* node) {
   }
 
     
-  return right;
 }
 
 template<class Key, class Value>
@@ -237,7 +236,6 @@ void AVLTree<Key, Value>::rotateRight(AVLNode<Key, Value>* node) {
       parent->setRight(left);
   }
 
-  return left;
 }
 
 template<class Key, class Value>
