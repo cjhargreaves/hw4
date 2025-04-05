@@ -425,135 +425,122 @@ void AVLTree<Key, Value>::remove(const Key& key)
 
 template<class Key, class Value>
 void AVLTree<Key, Value>::removeFix(AVLNode<Key, Value>* node, int8_t diff) {
+    // Base case: if node is null, return
+    if (node == nullptr) { return; }
 
-
-  if (node == nullptr) { return; }
-
-  AVLNode<Key, Value>* parent = node->getParent();
-  int8_t ndiff = 0;
-
-  if (parent != nullptr) {
-    if (parent->getLeft() == node) {
-      ndiff = -1;
-    } else {
-      ndiff = 1;
+    // Calculate next recursive call parameters
+    AVLNode<Key, Value>* parent = node->getParent();
+    int8_t ndiff = 0;
+    if (parent != nullptr) {
+        if (parent->getLeft() == node) {
+            ndiff = -1;
+        } else {
+            ndiff = 1;
+        }
     }
-  }
 
-  if (diff == -1) {
-
-    if (node->getBalance() + diff == -2) {
-      AVLNode<Key, Value>* child = node->getLeft();
-
-      if (child->getBalance() == -1) {
-        rotateRight(node);
-        node->setBalance(0);
-        child->setBalance(0);
-        removeFix(parent, ndiff);
-      }
-
-      else if (child->getBalance() == 0) {
-        rotateRight(node);
-        node->setBalance(-1);
-        child->setBalance(1);
-
-      }
-
-      else if (child->getBalance() == 1) {
-        AVLNode<Key, Value>* grandchild = child->getRight();
-        rotateLeft(child);
-        rotateRight(node);
-
-        if (grandchild->getBalance() == 1) {
-
-          node->setBalance(0);
-          child->setBalance(-1);
-          grandchild->setBalance(0);
+    // Calculate new balance
+    int8_t oldBalance = node->getBalance();
+    int8_t newBalance = oldBalance + diff;
+    
+    if (diff == -1) { // Removed from right subtree
+        if (newBalance == -2) {
+            AVLNode<Key, Value>* child = node->getLeft();
+            if (child == nullptr) return; // Safety check
+            
+            int8_t childBalance = child->getBalance();
+            
+            if (childBalance == -1 || childBalance == 0) {
+                rotateRight(node);
+                if (childBalance == -1) {
+                    node->setBalance(0);
+                    child->setBalance(0);
+                    removeFix(parent, ndiff);
+                } else { // childBalance == 0
+                    node->setBalance(-1);
+                    child->setBalance(1);
+                }
+            }
+            else if (childBalance == 1) {
+                AVLNode<Key, Value>* grandchild = child->getRight();
+                if (grandchild == nullptr) return; // Safety check
+                
+                int8_t grandchildBalance = grandchild->getBalance();
+                rotateLeft(child);
+                rotateRight(node);
+                
+                if (grandchildBalance == 1) {
+                    node->setBalance(0);
+                    child->setBalance(-1);
+                } else if (grandchildBalance == 0) {
+                    node->setBalance(0);
+                    child->setBalance(0);
+                } else { // grandchildBalance == -1
+                    node->setBalance(1);
+                    child->setBalance(0);
+                }
+                grandchild->setBalance(0);
+                removeFix(parent, ndiff);
+            }
+        }
+        else if (newBalance == -1) {
+            node->setBalance(-1);
+        }
+        else if (newBalance == 0) {
+            node->setBalance(0);
+            removeFix(parent, ndiff);
+        }
+    }
+    else if (diff == 1) { // Removed from left subtree
+        if (newBalance == 2) {
+            AVLNode<Key, Value>* child = node->getRight();
+            if (child == nullptr) return; // Safety check
+            
+            int8_t childBalance = child->getBalance();
+            
+            if (childBalance == 1 || childBalance == 0) {
+                rotateLeft(node);
+                if (childBalance == 1) {
+                    node->setBalance(0);
+                    child->setBalance(0);
+                    removeFix(parent, ndiff);
+                } else { // childBalance == 0
+                    node->setBalance(1);
+                    child->setBalance(-1);
+                }
+            }
+            else if (childBalance == -1) {
+                AVLNode<Key, Value>* grandchild = child->getLeft();
+                if (grandchild == nullptr) return; // Safety check
+                
+                int8_t grandchildBalance = grandchild->getBalance();
+                rotateRight(child);
+                rotateLeft(node);
+                
+                if (grandchildBalance == -1) {
+                    node->setBalance(0);
+                    child->setBalance(1);
+                } else if (grandchildBalance == 0) {
+                    node->setBalance(0);
+                    child->setBalance(0);
+                } else { // grandchildBalance == 1
+                    node->setBalance(-1);
+                    child->setBalance(0);
+                }
+                grandchild->setBalance(0);
+                removeFix(parent, ndiff);
+            }
+        }
+        else if (newBalance == 1) {
+            node->setBalance(1);
+        }
+        else if (newBalance == 0) {
+            node->setBalance(0);
+            removeFix(parent, ndiff);
         }
 
-        else if (grandchild->getBalance() == 0) {
-          node->setBalance(0);
-          child->setBalance(0);
-          grandchild->setBalance(0);
-        }
-
-        else if (grandchild->getBalance() == -1) {
-          node->setBalance(1);
-          child->setBalance(0);
-          grandchild->setBalance(0);
-        }
-
-        removeFix(parent, ndiff);
-      }
     }
 
-    else if (node->getBalance() + diff == -1) {
-      node->setBalance(-1);
-
-    }
-
-    else if (node->getBalance() +diff == 0) {
-      node->setBalance(0);
-      removeFix(parent, ndiff);
-    }
-  }
-
-  else if (diff == 1) {
-    if (node->getBalance() + diff == 2) {
-      AVLNode<Key, Value>* child = node->getRight();
-
-      if (child->getBalance() == 1) {
-        rotateLeft(node);
-        node->setBalance(0);
-        child->setBalance(0);
-        removeFix(parent, ndiff);
-      }
-
-      else if (child->getBalance() == 0) {
-        rotateLeft(node);
-        node->setBalance(1);
-        child->setBalance(-1);
-
-      }
-
-      else if (child->getBalance() == -1) {
-        AVLNode<Key, Value>* grandchild = child->getLeft();
-        rotateRight(child);
-        rotateLeft(node);
-
-        if (grandchild->getBalance() == -1) {
-          node->setBalance(0);
-          child->setBalance(1);
-          grandchild->setBalance(0);
-
-        }
-
-        else if (grandchild->getBalance() == 0) {
-          node->setBalance(0);
-          child->setBalance(0);
-          grandchild->setBalance(0);
-        }
-
-        else if (grandchild->getBalance() == 1) {
-          node->setBalance(-1);
-          child->setBalance(0);
-          grandchild->setBalance(0);
-        }
-
-        removeFix(parent, ndiff);
-      }
-    }
-
-    else if (node->getBalance() + diff == 1) {
-      node->setBalance(1);
-    }
-
-    else if (node->getBalance() + diff == 0) {
-      node->setBalance(0);
-      removeFix(parent, ndiff);
-
-    }
-  }
 }
 
 template<class Key, class Value>
