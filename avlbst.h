@@ -349,6 +349,87 @@ void AVLTree<Key, Value>::insertFix(AVLNode<Key, Value>* node, int8_t diff)
     }
 }
 
+/*
+ * Recall: The writeup specifies that if a node has 2 children you
+ * should swap with the predecessor and then remove.
+ */
+template<class Key, class Value>
+void AVLTree<Key, Value>:: remove(const Key& key)
+{
+    // TODO
+  //
+
+  AVLNode<Key, Value>* curr = static_cast<AVLNode<Key, Value>*>(this->root_);
+
+  while (curr != nullptr) {
+
+    if (key == curr->getKey()) {
+      break;
+    }
+
+    else if (key < curr->getKey()) {
+      curr = curr->getLeft();
+    }
+
+    else {
+      curr = curr->getRight();
+    }
+  }
+
+  if ( curr == nullptr ) { return; }
+
+  // two children, swap with predecessor
+  //
+  if (curr->getLeft() != nullptr && curr->getRight() != nullptr) {
+    AVLNode<Key, Value>* predecessor = static_cast<AVLNode<Key, Value>*>(this->predecessor(curr));
+    nodeSwap(curr, predecessor);
+  }
+
+  // curr has at most one child now
+  //
+  AVLNode<Key, Value>* parent = curr->getParent();
+
+  bool isLeft = (parent != nullptr && parent->getLeft() == curr);
+
+  // get child to replace current if exist
+  //
+  AVLNode<Key, Value>* child = curr->getLeft();
+  if (child == nullptr) {
+    child = curr->getRight();
+  }
+
+  if (parent == nullptr) {
+    this->root_ = child;
+  }
+
+  else if (isLeft) {
+    parent->setLeft(child);
+  }
+
+  else {
+    parent->setRight(child);
+  }
+
+  if (child != nullptr) {
+    child->setParent(parent);
+  }
+
+  if (parent != nullptr) {
+    int8_t diff;
+
+    if (isLeft) {
+      diff = 1;
+    } else {
+      diff = -1;
+    }
+
+    removeFix(parent, diff);
+  }
+
+
+  delete curr;
+}
+
 template<class Key, class Value>
 void AVLTree<Key, Value>::removeFix(AVLNode<Key, Value>* node, int8_t diff) {
 
