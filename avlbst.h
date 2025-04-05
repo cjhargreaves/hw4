@@ -433,9 +433,9 @@ void AVLTree<Key, Value>::removeFix(AVLNode<Key, Value>* node, int8_t diff) {
     int8_t ndiff = 0;
     if (parent != nullptr) {
         if (parent->getLeft() == node) {
-            ndiff = -1;
-        } else {
             ndiff = 1;
+        } else {
+            ndiff = -1;
         }
     }
 
