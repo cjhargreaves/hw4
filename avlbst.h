@@ -189,8 +189,8 @@ void AVLTree<Key, Value>::insert(const std::pair<const Key, Value> &new_item)
         parent->setLeft(newNode);
         // Update balance and fix if needed
         if (parent->getBalance() == 0) {
-            parent->setBalance(-1);
-            insertFix(parent, -1);
+            parent->setBalance(1);
+            insertFix(parent, 1);
         }
         else {
             parent->setBalance(0);
@@ -200,8 +200,8 @@ void AVLTree<Key, Value>::insert(const std::pair<const Key, Value> &new_item)
         parent->setRight(newNode);
         // Update balance and fix if needed
         if (parent->getBalance() == 0) {
-            parent->setBalance(1);
-            insertFix(parent, 1);
+            parent->setBalance(-1);
+            insertFix(parent, -1);
         }
         else {
             parent->setBalance(0);
@@ -270,9 +270,9 @@ void AVLTree<Key, Value>::insertFix(AVLNode<Key, Value>* node, int8_t diff)
     int8_t nextDiff = 0;
     if (parent) {
         if (parent->getLeft() == node) {
-            nextDiff = -1;
-        } else {
             nextDiff = 1;
+        } else {
+            nextDiff = -1;
         }
     }
 
@@ -422,9 +422,9 @@ void AVLTree<Key, Value>::removeFix(AVLNode<Key, Value>* node, int8_t diff) {
 
   if (parent != nullptr) {
     if (parent->getLeft() == node) {
-      ndiff = 1;
-    } else {
       ndiff = -1;
+    } else {
+      ndiff = 1;
     }
   }
 
