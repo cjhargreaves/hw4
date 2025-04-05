@@ -566,7 +566,7 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
   // start with node has two children
   if (node->getLeft() != nullptr && node->getRight() != nullptr) {
     // find predecessor and swap
-    Node<Key, Value>* predecessor = predecessor(node);
+    Node<Key, Value>* predecessor = BinarySearchTree<Key, Value>::predecessor(node);
     nodeSwap(node, predecessor);
   }
 
