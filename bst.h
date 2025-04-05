@@ -526,11 +526,7 @@ void BinarySearchTree<Key, Value>::insert(const std::pair<const Key, Value> &key
   // now curr is nullptr, and parent is where we need to insert
   Node<Key, Value>* newNode = new Node<Key, Value>(keyValuePair.first, keyValuePair.second, parent);
 
-  if (parent == nullptr) {
-    root_ = newNode;
-  }
-
-  else if (keyValuePair.first < parent->getKey()) {
+  if (keyValuePair.first < parent->getKey()) {
     parent->setLeft(newNode);
   }
 
@@ -568,6 +564,8 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
     // find predecessor and swap
     Node<Key, Value>* predecessor = BinarySearchTree<Key, Value>::predecessor(node);
     nodeSwap(node, predecessor);
+
+    node = predecessor;
   }
 
   // if not two children, should just have one move
