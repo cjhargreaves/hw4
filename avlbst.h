@@ -354,28 +354,9 @@ void AVLTree<Key, Value>::insertFix(AVLNode<Key, Value>* node, int8_t diff)
  * should swap with the predecessor and then remove.
  */
 template<class Key, class Value>
-void AVLTree<Key, Value>:: remove(const Key& key)
+void AVLTree<Key, Value>::remove(const Key& key)
 {
-    // TODO
-  //
-
-  AVLNode<Key, Value>* curr = static_cast<AVLNode<Key, Value>*>(this->root_);
-
-  while (curr != nullptr) {
-
-    if (key == curr->getKey()) {
-      break;
-    }
-
-    else if (key < curr->getKey()) {
-      curr = curr->getLeft();
-    }
-
-    else {
-      curr = curr->getRight();
-    }
-  }
-
+    AVLNode<Key, Value>* curr = static_cast<AVLNode<Key, Value>*>(this->internalFind(key));
   if ( curr == nullptr ) { return; }
 
   // two children, swap with predecessor
