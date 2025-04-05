@@ -198,7 +198,7 @@ void AVLTree<Key, Value>::rotateLeft(AVLNode<Key, Value>* node) {
   if (node->getParent() != nullptr) {
     if (node->getParent()->getLeft() == node) {
       node->getParent()->setLeft(right);
-    } else if (node->getParent->getRight() == node) {
+    } else if (node->getParent()->getRight() == node) {
       node->getParent()->setRight(right);
     }
   } else {
@@ -225,7 +225,7 @@ void AVLTree<Key, Value>::rotateRight(AVLNode<Key, Value>* node) {
   if (node->getParent() != nullptr) {
     if (node->getParent()->getLeft() == node) {
       node->getParent()->setLeft(left);
-    } else if (node->getParent->getRight() == node) {
+    } else if (node->getParent()->getRight() == node) {
       node->getParent()->setRight(left);
     }
   } else {
