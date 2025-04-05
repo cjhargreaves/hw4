@@ -258,10 +258,14 @@ void AVLTree<Key, Value>::rotateRight(AVLNode<Key, Value>* node) {
 
 template<class Key, class Value>
 void AVLTree<Key, Value>::insertFix(AVLNode<Key, Value>* node, int8_t diff)
-{
-    // Base case: reached root or no more propagation needed
-    if (node == nullptr || node->getBalance() == 0) {
-        return;
+{   
+
+    if (node == nullptr) {
+      return;
+    }
+
+    if (node->getBalance() == 0) {
+      return;
     }
 
     AVLNode<Key, Value>* parent = node->getParent();
