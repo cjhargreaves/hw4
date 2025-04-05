@@ -565,7 +565,6 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
     Node<Key, Value>* predecessor = BinarySearchTree<Key, Value>::predecessor(node);
     nodeSwap(node, predecessor);
 
-    node = predecessor;
   }
 
   // if not two children, should just have one move
