@@ -258,14 +258,10 @@ void AVLTree<Key, Value>::rotateRight(AVLNode<Key, Value>* node) {
 
 template<class Key, class Value>
 void AVLTree<Key, Value>::insertFix(AVLNode<Key, Value>* node, int8_t diff)
-{   
-
-    if (node == nullptr) {
-      return;
-    }
-
-    if (node->getBalance() == 0) {
-      return;
+{
+    // Base case: reached root or no more propagation needed
+    if (node == nullptr || node->getBalance() == 0) {
+        return;
     }
 
     AVLNode<Key, Value>* parent = node->getParent();
@@ -282,39 +278,12 @@ void AVLTree<Key, Value>::insertFix(AVLNode<Key, Value>* node, int8_t diff)
 
     // Case 1: The node has become unbalanced
     if (node->getBalance() == 2) {
-        // Right heavy
-        if (node->getRight()->getBalance() >= 0) {
-            // Right-right case
-            rotateLeft(node);
-            node->setBalance(0);
-            node->getParent()->setBalance(0);
-        } 
-        else {
-            // Right-left case
-            AVLNode<Key, Value>* rightChild = node->getRight();
-            AVLNode<Key, Value>* leftGrandchild = rightChild->getLeft();
-            rotateRight(rightChild);
-            rotateLeft(node);
-            
-            // Update balances based on grandchild's balance
-            if (leftGrandchild->getBalance() == -1) {
-                node->setBalance(1);
-                rightChild->setBalance(0);
-            } 
-            else if (leftGrandchild->getBalance() == 1) {
-                node->setBalance(0);
-                rightChild->setBalance(-1);
-            } 
-            else {
-                node->setBalance(0);
-                rightChild->setBalance(0);
-            }
-            leftGrandchild->setBalance(0);
-        }
-    } 
-    else if (node->getBalance() == -2) {
+
         // Left heavy
-        if (node->getLeft()->getBalance() <= 0) {
+        AVLNode<Key, Value>* leftChild = node->getLeft();
+        if (leftChild == nullptr) return;  // Safety check
+        
+        if (leftChild->getBalance() >= 0) {
             // Left-left case
             rotateRight(node);
             node->setBalance(0);
@@ -322,8 +291,10 @@ void AVLTree<Key, Value>::insertFix(AVLNode<Key, Value>* node, int8_t diff)
         } 
         else {
             // Left-right case
-            AVLNode<Key, Value>* leftChild = node->getLeft();
+
             AVLNode<Key, Value>* rightGrandchild = leftChild->getRight();
+            if (rightGrandchild == nullptr) return;  // Safety check
+            
             rotateLeft(leftChild);
             rotateRight(node);
             
@@ -342,10 +313,47 @@ void AVLTree<Key, Value>::insertFix(AVLNode<Key, Value>* node, int8_t diff)
             }
             rightGrandchild->setBalance(0);
         }
+        return; // No need to propagate further
+    } 
+    else if (node->getBalance() == -2) {
+        // Right heavy
+        AVLNode<Key, Value>* rightChild = node->getRight();
+        if (rightChild == nullptr) return;  // Safety check
+        
+        if (rightChild->getBalance() <= 0) {
+            // Right-right case
+            rotateLeft(node);
+            node->setBalance(0);
+            node->getParent()->setBalance(0);
+        } 
+        else {
+            // Right-left case
+            AVLNode<Key, Value>* leftGrandchild = rightChild->getLeft();
+            if (leftGrandchild == nullptr) return;  // Safety check
+            
+            rotateRight(rightChild);
+            rotateLeft(node);
+            
+            // Update balances based on grandchild's balance
+            if (leftGrandchild->getBalance() == -1) {
+                node->setBalance(1);
+                rightChild->setBalance(0);
+            } 
+            else if (leftGrandchild->getBalance() == 1) {
+                node->setBalance(0);
+                rightChild->setBalance(-1);
+            } 
+            else {
+                node->setBalance(0);
+                rightChild->setBalance(0);
+            }
+            leftGrandchild->setBalance(0);
+        }
+        return; // No need to propagate further
     }
     
     // Case 2: The node is balanced but we need to propagate up
-    else if (parent) {
+    if (parent) {
         parent->updateBalance(nextDiff);
         if (parent->getBalance() != 0) {
             insertFix(parent, nextDiff);
