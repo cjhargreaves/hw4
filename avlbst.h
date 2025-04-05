@@ -191,56 +191,53 @@ void AVLTree<Key, Value>::insert (const std::pair<const Key, Value> &new_item)
 
 template<class Key, class Value>
 void AVLTree<Key, Value>::rotateLeft(AVLNode<Key, Value>* node) {
-
   AVLNode<Key, Value>* right = node->getRight();
-
-  right->setParent(node->getParent());
-
-  if (node->getParent() != nullptr) {
-    if (node->getParent()->getLeft() == node) {
-      node->getParent()->setLeft(right);
-    } else if (node->getParent()->getRight() == node) {
-      node->getParent()->setRight(right);
-    }
-  } else {
-    this->root_ = right;
-  }
-
+  AVLNode<Key, Value>* parent = node->getParent();
+  
   node->setRight(right->getLeft());
-
   if (right->getLeft() != nullptr) {
-    right->getLeft()->setParent(node);
+      right->getLeft()->setParent(node);
   }
-
+  
   right->setLeft(node);
   node->setParent(right);
+  right->setParent(parent);
+  
+  if (parent == nullptr) {
+      this->root_ = right;
+  } else if (parent->getLeft() == node) {
+      parent->setLeft(right);
+  } else {
+      parent->setRight(right);
+  }
+
+    
+  return right;
 }
 
 template<class Key, class Value>
 void AVLTree<Key, Value>::rotateRight(AVLNode<Key, Value>* node) {
-
   AVLNode<Key, Value>* left = node->getLeft();
-
-  left->setParent(node->getParent());
-
-  if (node->getParent() != nullptr) {
-    if (node->getParent()->getLeft() == node) {
-      node->getParent()->setLeft(left);
-    } else if (node->getParent()->getRight() == node) {
-      node->getParent()->setRight(left);
-    }
-  } else {
-    this->root_ = left;
-  }
-
+  AVLNode<Key, Value>* parent = node->getParent();
+  
   node->setLeft(left->getRight());
-
   if (left->getRight() != nullptr) {
-    left->getRight()->setParent(node);
+      left->getRight()->setParent(node);
+  }
+  
+  left->setRight(node);
+  node->setParent(left);
+  left->setParent(parent);
+  
+  if (parent == nullptr) {
+      this->root_ = left;
+  } else if (parent->getLeft() == node) {
+      parent->setLeft(left);
+  } else {
+      parent->setRight(left);
   }
 
-  left->setLeft(node);
-  node->setParent(left);
+  return left;
 }
 
 template<class Key, class Value>
