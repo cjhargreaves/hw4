@@ -379,7 +379,7 @@ void AVLTree<Key, Value>::insertFix(AVLNode<Key, Value>* node, int8_t diff)
       } 
 
       else {
-          AVLNode<Key, Value>* lgChild = right->getLeft();
+      AVLNode<Key, Value>* lgChild = right->getLeft();
           if (lgChild == nullptr) { return;  }
           
           rotateRight(right);
